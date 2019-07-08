@@ -1,0 +1,110 @@
+package com.knickglobal.webview;
+
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.Toast;
+
+@SuppressLint("SetJavaScriptEnabled")
+public class MainActivity extends AppCompatActivity {
+
+    private boolean doubleBackPress = false;
+
+    private WebView webView;
+
+    @SuppressLint("JavascriptInterface")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setTitle("Admin App");
+
+        inits();
+
+    }
+
+    private void inits() {
+
+        webView = findViewById(R.id.webView1);
+
+        WebSettings webSetting = webView.getSettings();
+        webSetting.setBuiltInZoomControls(true);
+        webView.loadUrl("http://ajksa.com/New_JK/New_templ/template/users.php#");
+        webView.setWebViewClient(new MyWebViewClient());
+        webView.getSettings().setJavaScriptEnabled(true);
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                //Required functionality here
+                return super.onJsAlert(view, url, message, result);
+            }
+
+        });
+
+    }
+
+    public class MyWebViewClient extends android.webkit.WebViewClient {
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (doubleBackPress) {
+            super.onBackPressed();
+            finish();
+            return;
+        }
+
+        this.doubleBackPress = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackPress = false;
+            }
+        }, 2000);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.log_out) {
+            Toast.makeText(getApplicationContext(), "Log out", Toast.LENGTH_LONG).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}
